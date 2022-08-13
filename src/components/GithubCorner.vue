@@ -1,7 +1,7 @@
 <script setup lang="ts" name="GithubCorner"></script>
 
 <template>
-  <a href="https://www.github.com/naecoo/" class="github-corner">
+  <a href="https://github.com/naecoo/emoji-mix" class="github-corner">
     <svg
       width="60"
       height="60"

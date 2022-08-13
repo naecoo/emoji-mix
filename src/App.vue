@@ -1,24 +1,20 @@
 <script setup lang="ts" name="App">
 /*
   todo: https://tikolu.net/emojimix
-  [] 暗黑模式
-  [] PWA
-  [] copy
-  [] view board
-  [] random pick
   [] support mobile、ipad、pc
+  [] copy(https+cors)
   [] animation
-  [] url query
+  [] 暗黑模式
   [] google ga
   [] a11y
 */
 import { computed, ref, watchEffect } from 'vue';
 import GithubCorner from '@/components/GithubCorner.vue';
 import Slider from '@/components/Slider.vue';
-import { emojis } from '@/emojis';
+import EmojiPicker from '@/components/EmojiPicker.vue';
 import notFoundImage from '@/assets/not-found.png';
-
-const getMixedEmojiUrl = (x: string, y: string) => `https://www.gstatic.com/android/keyboard/emojikitchen/20201001/u${x}/u${x}_u${y}.png`;
+import { emojis } from '@/emojis';
+import { getMixedEmojiUrl } from '@/utils';
 
 const emoji1 = ref('');
 const emoji2 = ref('');
@@ -33,6 +29,7 @@ if (e1 && e2 && emojis.includes(e1) && emojis.includes(e2)) {
   emoji2.value = emojis[2];
 }
 
+// 获取 emojimix 图片的url
 const url = ref('');
 const alternativeUrl = ref('');
 const isNotFound = computed(() => url.value === notFoundImage);
@@ -44,6 +41,7 @@ watchEffect(() => {
   alternativeUrl.value = getMixedEmojiUrl(emoji2.value, emoji1.value);
 });
 
+// 图片加载错误处理
 const onError = (e: Event) => {
   if (url.value !== alternativeUrl.value) {
     url.value = alternativeUrl.value;
@@ -55,11 +53,33 @@ const onError = (e: Event) => {
   return false;
 };
 
+// 洗牌
 const shuffle = () => {
   const randomIndex1 = Math.floor(emojis.length * Math.random());
   const randomIndex2 = Math.floor(emojis.length * Math.random());
   emoji1.value = emojis[randomIndex1];
   emoji2.value = emojis[randomIndex2];
+};
+
+// emoji 选择弹窗
+const visible = ref(false);
+const select = ref('');
+let pickType = 1;
+const onPick = (value: string) => {
+  if (pickType === 1) {
+    emoji1.value = value;
+  } else {
+    emoji2.value = value;
+  }
+};
+const onSelect = (type: number) => {
+  pickType = type;
+  visible.value = true;
+  if (pickType === 1) {
+    select.value = emoji1.value;
+  } else {
+    select.value = emoji2.value;
+  }
 };
 </script>
 
@@ -72,12 +92,13 @@ const shuffle = () => {
     <span class="icon">+</span>
     <Slider key="slider2" v-model:value="emoji2" />
     <span class="icon">=</span>
-    <img v-if="url" :src="url"  alt="emojimix" class="result" @error="onError" />
+    <img v-if="url" class="emojimix-image" alt="emojimix" :src="url" @error="onError" @click="shuffle" />
     <span v-if="isNotFound">not found image</span>
   </main>
-  <footer>
-    <button @click="shuffle">shuffle</button>
-  </footer>
+  <button @click="shuffle"> shuffle </button>
+  <button @click="onSelect(1)"> select1 </button>
+  <button @click="onSelect(2)"> select2 </button>
+  <EmojiPicker v-model:visible="visible" :select="select" @pick="onPick" />
 </template>
 
 <style lang="less">
@@ -86,19 +107,23 @@ html {
   margin: 0;
   padding: 0;
 }
+
 .app-main {
   display: flex;
   align-items: center;
+
   .icon {
     display: inline-block;
     font-size: 2em;
     margin: 0 1em;
     transform: translateY(-0.3em);
   }
-  .result {
+
+  .emojimix-image {
     display: inline-block;
     width: 4em;
     height: 4em;
+    cursor: pointer;
   }
 }
 </style>

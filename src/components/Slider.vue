@@ -4,6 +4,7 @@ import { Splide, SplideSlide } from '@splidejs/vue-splide';
 import type { Options as SplideOptions } from '@splidejs/vue-splide';
 import '@splidejs/vue-splide/css';
 import { emojis } from '@/emojis';
+import { getEmojiUrl } from '@/utils';
 
 const props = defineProps<{
   value: string;
@@ -55,7 +56,7 @@ watch(() => props.value, (val) => {
     <SplideSlide v-for="id in emojis" :key="id">
       <img
         class="slider-image"
-        :src="`https://raw.githubusercontent.com/googlefonts/noto-emoji/main/svg/emoji_u${id}.svg`"
+        :src="getEmojiUrl(id)"
         :alt="`emoji-u${id}`"
       />
     </SplideSlide>
