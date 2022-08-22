@@ -3,7 +3,6 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <link rel="manifest" href="/manifest.json" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Emoji Mix</title>
   </head>
@@ -11,12 +10,4 @@
     <div id="app"></div>
     <script type="module" src="/src/main.ts"></script>
   </body>
-  <script>
-    if (navigator.serviceWorker) {
-      navigator.serviceWorker.register('sw.js')
-        .then(function(registration) {
-          console.log('Registered SW at scope: ', registration.scope);
-        });
-    }
-  </script>
 </html>

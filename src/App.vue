@@ -1,6 +1,5 @@
 <script setup lang="ts" name="App">
 /*
-  todo: https://tikolu.net/emojimix
   [] support mobile、ipad、pc
   [] copy(https+cors)
   [] animation
