@@ -1,14 +1,5 @@
 <script setup lang="ts" name="App">
-/*
-  [] support mobile、ipad、pc
-  [] copy(https+cors)
-  [] animation
-  [] 暗黑模式
-  [] google ga
-  [] a11y
-  [] pwa
-  [] 爬虫爬取图片，省去加载地事件
-*/
+
 import { computed, ref, watchEffect } from 'vue';
 import GithubCorner from '@/components/GithubCorner.vue';
 import Slider from '@/components/Slider.vue';
