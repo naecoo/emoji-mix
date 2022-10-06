@@ -16,8 +16,6 @@ const onPick = (value: string) => {
   emit('pick', value);
   emit('update:visible', false);
 }
-
-// todo: 动画和UI优化
 </script>
 
 <template>
@@ -68,7 +66,7 @@ const onPick = (value: string) => {
     cursor: pointer;
 
     &.is-select {
-      outline: 2px solid red;
+      outline: 2px solid azure;
     }
   }
 }

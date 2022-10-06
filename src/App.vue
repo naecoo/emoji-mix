@@ -1,17 +1,17 @@
 <script setup lang="ts" name="App">
-
-import { computed, ref, watchEffect } from 'vue';
+import { ref, watchEffect, watch, compile, computed } from 'vue';
 import GithubCorner from '@/components/GithubCorner.vue';
 import Slider from '@/components/Slider.vue';
 import EmojiPicker from '@/components/EmojiPicker.vue';
 import notFoundImage from '@/assets/not-found.png';
-import { emojis } from '@/emojis';
+import { emojis, emojisMix } from '@/emojis';
 import { getMixedEmojiUrl } from '@/utils';
 
 const emoji1 = ref('');
 const emoji2 = ref('');
+const loading = ref(false);
 
-// get initinal value
+// 初始化
 const [_, e1, e2] = /^#([\d\w]{5})_([\d\w]{5})$/g.exec(location.hash) ?? [];
 if (e1 && e2 && emojis.includes(e1) && emojis.includes(e2)) {
   emoji1.value = e1;
@@ -21,31 +21,47 @@ if (e1 && e2 && emojis.includes(e1) && emojis.includes(e2)) {
   emoji2.value = emojis[2];
 }
 
-// 获取 emojimix 图片的url
+const isMixExist = (e1: string, e2: string) => {
+  const index = emojis.indexOf(e2);
+  return emojisMix[e1].includes(index);
+}
+
+// 获取url
 const url = ref('');
-const alternativeUrl = ref('');
-const isNotFound = computed(() => url.value === notFoundImage);
-let count = 0;
 watchEffect(() => {
-  count++;
-  location.hash = `${emoji1.value}_${emoji2.value}`;
-  url.value = getMixedEmojiUrl(emoji1.value, emoji2.value);
-  alternativeUrl.value = getMixedEmojiUrl(emoji2.value, emoji1.value);
+  const e1 = emoji1.value;
+  const e2 = emoji2.value;
+  location.hash = `${e1}_${e2}`;
+  if (isMixExist(e1, e2)) {
+    url.value = getMixedEmojiUrl(e1, e2);
+  } else if (isMixExist(e2, e1)) {
+    url.value = getMixedEmojiUrl(e2, e1);
+  } else {
+    url.value = notFoundImage;
+  }
+});
+const alt = computed(() => {
+  return url.value === notFoundImage ? 'image not found' : location.hash.slice(1);
 });
 
-// 图片加载错误处理
+watch(url, () => {
+  loading.value = true;
+});
+
+// 加载完成
+const onLoad = () => {
+  loading.value = false;
+};
+
+// 加载错误
 const onError = (e: Event) => {
-  if (url.value !== alternativeUrl.value) {
-    url.value = alternativeUrl.value;
-  } else {
-    url.value = notFoundImage
-  }
+  loading.value = false;
   e.preventDefault();
   e.stopPropagation();
   return false;
 };
 
-// 洗牌
+// 乱序
 const shuffle = () => {
   const randomIndex1 = Math.floor(emojis.length * Math.random());
   const randomIndex2 = Math.floor(emojis.length * Math.random());
@@ -80,16 +96,23 @@ const onSelect = (type: number) => {
     <GithubCorner />
   </header>
   <main class="app-main">
-    <Slider key="slider1" v-model:value="emoji1" />
+    <div class="silder-container">
+      <Slider key="slider1" v-model:value="emoji1" />
+      <button class="btn" @click="onSelect(1)">pick</button>
+    </div>
     <span class="icon">+</span>
-    <Slider key="slider2" v-model:value="emoji2" />
+    <div class="silder-container">
+      <Slider key="slider2" v-model:value="emoji2" />
+      <button class="btn" @click="onSelect(2)">pick</button>
+    </div>
     <span class="icon">=</span>
-    <img v-if="url" class="emojimix-image" alt="emojimix" :src="url" @error="onError" @click="shuffle" />
-    <span v-if="isNotFound">not found image</span>
+    <img v-show="!loading" class="emojimix-image" :alt="alt" :src="url" @error="onError" @load="onLoad"
+      @click="shuffle" />
+    <span v-show="loading">loading...</span>
   </main>
-  <button @click="shuffle"> shuffle </button>
-  <button @click="onSelect(1)"> select1 </button>
-  <button @click="onSelect(2)"> select2 </button>
+  <footer class="app-footer">
+    <button class="btn" @click="shuffle">shuffle</button>
+  </footer>
   <EmojiPicker v-model:visible="visible" :select="select" @pick="onPick" />
 </template>
 
@@ -98,6 +121,14 @@ body,
 html {
   margin: 0;
   padding: 0;
+  user-select: none;
+}
+
+#app {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 120px;
 }
 
 .app-main {
@@ -117,5 +148,28 @@ html {
     height: 4em;
     cursor: pointer;
   }
+
+  .silder-container {
+    .btn {
+      margin-block-start: 8px;
+    }
+  }
+}
+
+.app-footer {
+  margin-block-start: 24px;
+  text-align: left;
+  .btn {
+    background-color: darkorange;
+  }
+}
+
+.btn {
+  border: none;
+  outline: none;
+  border-radius: 4px;
+  padding: 6px 12px;
+  cursor: pointer;
+  background-color: bisque;
 }
 </style>
