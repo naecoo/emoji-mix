@@ -106,9 +106,11 @@ const onSelect = (type: number) => {
       <button class="btn" @click="onSelect(2)">pick</button>
     </div>
     <span class="icon">=</span>
-    <img v-show="!loading" class="emojimix-image" :alt="alt" :src="url" @error="onError" @load="onLoad"
-      @click="shuffle" />
-    <span v-show="loading">loading...</span>
+    <div class="mix-image">
+      <img v-show="!loading" class="emojimix-image" :alt="alt" :src="url" @error="onError" @load="onLoad"
+        @click="shuffle" />
+      <span v-show="loading">loading...</span>
+    </div>
   </main>
   <footer class="app-footer">
     <button class="btn" @click="shuffle">shuffle</button>
@@ -142,6 +144,10 @@ html {
     transform: translateY(-0.3em);
   }
 
+  .mix-image {
+    width: 4em;
+  }
+
   .emojimix-image {
     display: inline-block;
     width: 4em;
@@ -159,6 +165,7 @@ html {
 .app-footer {
   margin-block-start: 24px;
   text-align: left;
+
   .btn {
     background-color: darkorange;
   }
